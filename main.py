@@ -4,9 +4,9 @@ import sys
 import wiringpi
 import datetime
 import csv
-# import commands
-import subprocess
-import matplotlib.pyplot as plt
+import commands
+# import subprocess
+
 
 ad_in=0x41      #voltage_in, current_in
 PWM_PIN = 18     #GPIOの18
@@ -56,14 +56,14 @@ wiringpi.pwmWrite(PWM_PIN, DUTY)
 
 #---------------------Input Functions------------------------
 def GetVin():
-	check = subprocess.getoutput(in_v)
+	check = commands.getoutput(in_v)
 # 	print(in_v)
 # 	print(check)
 	V=(int(check[4:6],16)*256+int(check[2:4],16))*1.25/1000
 	return V*vcali
 
 def GetAin():
-	check = subprocess.getoutput(in_c)
+	check = commands.getoutput(in_c)
 	if int(check[4:6],16)<128:
 
 		A1=(int(check[4:6],16)*256+int(check[2:4],16))
@@ -71,7 +71,7 @@ def GetAin():
 	else:
 		A2=(int(check[4:6],16)*256+int(check[2:4],16)-256*256)
 		return int(A2)*icali_in
-check = subprocess.getoutput(in_cali)
+check = commands.getoutput(in_cali)
 
 
 #-------------------Exception handling functions---------------------------------------
@@ -138,7 +138,8 @@ def getTime(timestring):
     timeObj = datetime.datetime.strptime(t[3], '%H:%M:%S') 
     return timeObj	
 
-
+# ---------------------- Just comment if not needed ---------------------
+import matplotlib.pyplot as plt
 def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
     fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
     plt.cla()
