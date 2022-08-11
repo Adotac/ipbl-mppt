@@ -41,7 +41,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--Duty", help="Set initial Duty value")
 parser.add_argument("-i", "--D_Increment", help="Set duty incremental value")
 parser.add_argument("-r", "--Range", help="Set Range value")
-# parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
+parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
 
 args = parser.parse_args()
 
@@ -169,7 +169,6 @@ def getTime(timestring):
 # ---------------------- Just comment if not needed ---------------------
 import matplotlib.pyplot as plt
 
-
 def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
     fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
     plt.cla()
@@ -248,7 +247,7 @@ try:
         makecsv()
         disp()
 
-        if str(args.Graph) == "True":
+        if str(args.Graph) == "True" or str(args.Graph) == "true":
             figures()  # Figure functions, uncomment if not needed
 
         wiringpi.delay(delay)

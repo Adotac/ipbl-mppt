@@ -249,7 +249,7 @@ try:
         makecsv()
         disp()
 
-        if str(args.Graph) == "True":
+        if str(args.Graph) == "True" or str(args.Graph) == "true":
             figures()  # Figure functions, uncomment if not needed
 
         wiringpi.delay(delay)
