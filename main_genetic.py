@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
+import itertools
+
 import random
 import numpy as np
 import math
+#------------#
 import sys
 import wiringpi
 import datetime
@@ -120,12 +123,12 @@ class genetic:
 
         self.OPTIMAL_VALUES = ()
 
-		def osc_distance(x1, x2, y1, y2):# oscillation distance from old value to new value
-			return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        def osc_distance(x1, x2, y1, y2):  # oscillation distance from old value to new value
+            return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
         def fitness_score(duty_arr):  # array of x & y points
-            rear_states = duty_arr # generated duty from mppt
-            
+            rear_states = duty_arr  # generated duty from mppt
+
             # score_distance = distance(rear_states, sum=True)
             # return score_distance, rear_states
 
@@ -136,6 +139,55 @@ class genetic:
                 new = float(round(np.random.uniform(0, self.DLIMIT), 2))
                 pop.append(new)
             return pop
+        
+        def selection(population, duty_arr):
+            parents = []
+            pick = random.uniform(0, max(duty_arr))
+            current = 0
+            for ind in population:
+                # select parents with roulette wheel selection
+                FS = fitness_score(ind)
+                current += FS
+                if current > pick:
+                    parents.append(ind)
+
+            return parents
+        
+        def crossover(parents):
+            MIXING_PAIR = 2
+            cross_point = random.randint(0, self.DLIMIT-1)
+            offsprings = []
+            combination = list(itertools.combinations(parents, MIXING_PAIR)) # 2d array of pairs
+            for comb in combination:
+                parent1_right = comb[0][cross_point:]
+                parent2_right = comb[1][:3-cross_point]
+                comb[0][cross_point:] = parent2_right
+                comb[1][:3-cross_point] = parent1_right
+                for i in comb:
+                    offsprings.append(i)
+
+            return offsprings
+
+        def mutation(offspring, duty_arr):
+            MUTATION_RATE = 0.2
+            for i in range(self.DLIMIT):
+                if random.random() < MUTATION_RATE:
+                    offspring[i] = float(round(np.random.uniform(0, max(duty_arr)+50),2))
+
+            return offspring
+        
+        def evolve(population):
+            parents = selection(population)
+
+            offsprings = crossover(parents)
+            offsprings = list(map(mutation, offsprings))
+            new_gen = offsprings
+            for ind in population:
+                new_gen.append(ind)
+
+            new_gen = sorted(new_gen, key=lambda x: fitness_score(x)[0], reverse=False)
+
+            return new_gen[:self.POP_MAX]
 
 
 # --------------Datetime processing---------------------
