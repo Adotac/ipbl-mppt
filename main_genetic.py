@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+import random
+import numpy as np
+import math
 import sys
 import wiringpi
 import datetime
@@ -105,6 +109,35 @@ def error(address):
     wiringpi.delay(3 * delay)
 
 
+# ------------------------- Genetic Algo -------------------------- #
+
+
+class genetic:
+    def __init__(self):
+        self.POP_MAX = 5
+        self.DLIMIT = 80  # Duty limit
+        self.INC_LIMIT = 10  # duty increment limit
+
+        self.OPTIMAL_VALUES = ()
+
+		def osc_distance(x1, x2, y1, y2):# oscillation distance from old value to new value
+			return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+        def fitness_score(duty_arr):  # array of x & y points
+            rear_states = duty_arr # generated duty from mppt
+            
+            # score_distance = distance(rear_states, sum=True)
+            # return score_distance, rear_states
+
+        def gen_populate():
+            pop = []
+            for i in range(self.POP_MAX):
+                # random floats
+                new = float(round(np.random.uniform(0, self.DLIMIT), 2))
+                pop.append(new)
+            return pop
+
+
 # --------------Datetime processing---------------------
 def Ddata():
     today1 = datetime.datetime.today()
@@ -116,7 +149,8 @@ def Ddata():
     second = str(today1.second)
     if int(minute) < 10:
         minute = '0' + minute
-    Ddata = "\'" + year + '/' + month + '/' + day + '/' + hour + ':' + minute + ':' + second + "\'"
+    Ddata = "\'" + year + '/' + month + '/' + day + \
+        '/' + hour + ':' + minute + ':' + second + "\'"
     return Ddata
 
 
@@ -134,6 +168,8 @@ def makecsv():
 
 # v1,p1---->new,  v0,p0----->old
 # --------------------------MPPT------------------------
+
+
 def mppt(duty_now):
     case1 = (duty_now <= miLim)  # case when duty ratio reach lower limit
     case2 = (duty_now >= maLim)  # case when duty ratio reach upper limit
@@ -168,31 +204,34 @@ def getTime(timestring):
 
 
 # ---------------------- Just comment if not needed ---------------------
-import matplotlib.pyplot as plt
 
 
 def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
-    fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
+    fig = plt.figure('Graph MPPT', figsize=(
+        10, 12), dpi=60, tight_layout=False)
     plt.cla()
     rows = 3
     col = 1
 
     fig.add_subplot(rows, col, 1)
     plt.plot(x, y1, color='red')
-    plt.ylabel(ytext1)
+    plt.ylabel(ytext1, fontsize=10)
     plt.xlabel(xtext)
+    # plt.ylim(0, max(y1))
     plt.grid(True)
 
     fig.add_subplot(rows, col, 2)
     plt.plot(x, y2, color='green')
     plt.ylabel(ytext2)
     plt.xlabel(xtext)
+    # plt.ylim(0, max(y2))
     plt.grid(True)
 
     fig.add_subplot(rows, col, 3)
     plt.plot(x, y3, color='blue')
     plt.ylabel(ytext3)
     plt.xlabel(xtext)
+    # plt.ylim(0, max(y3))
     plt.grid(True)
 
     plt.pause(0.1)

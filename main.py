@@ -154,57 +154,57 @@ def mppt(duty_now):
 
 # --------------------------display data------------------------
 def disp():
-    d = 'Date: ' + date + '    Vin:' + str(v1) + ' V' + '    Iin:' + str(i1) + ' A' + '    Pout: ' + str(
+    d = 'Date: ' + date + '    Vin:' + str(v1) + ' V' + '    Iin:' + str(i1) + ' A' + '    Pin: ' + str(
         p1) + ' W' + '    DUTY: ' + str(DUTY) + ' alpha'
     print(d)
 
 
-def getTime(timestring):
-    t = timestring.replace("'", '')
-    t = t.split('/')
-    timeObj = datetime.datetime.strptime(t[3], '%H:%M:%S')
-    return timeObj
+# def getTime(timestring):
+#     t = timestring.replace("'", '')
+#     t = t.split('/')
+#     timeObj = datetime.datetime.strptime(t[3], '%H:%M:%S')
+#     return timeObj
 
 
-# ---------------------- Just comment if not needed ---------------------
-import matplotlib.pyplot as plt
+# # ---------------------- Just comment if not needed ---------------------
+# import matplotlib.pyplot as plt
 
-def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
-    fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
-    plt.cla()
-    rows = 3
-    col = 1
+# def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
+#     fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
+#     plt.cla()
+#     rows = 3
+#     col = 1
 
-    fig.add_subplot(rows, col, 1)
-    plt.plot(x, y1, color='red')
-    plt.ylabel(ytext1)
-    plt.xlabel(xtext)
-    plt.grid(True)
+#     fig.add_subplot(rows, col, 1)
+#     plt.plot(x, y1, color='red')
+#     plt.ylabel(ytext1)
+#     plt.xlabel(xtext)
+#     plt.grid(True)
 
-    fig.add_subplot(rows, col, 2)
-    plt.plot(x, y2, color='green')
-    plt.ylabel(ytext2)
-    plt.xlabel(xtext)
-    plt.grid(True)
+#     fig.add_subplot(rows, col, 2)
+#     plt.plot(x, y2, color='green')
+#     plt.ylabel(ytext2)
+#     plt.xlabel(xtext)
+#     plt.grid(True)
 
-    fig.add_subplot(rows, col, 3)
-    plt.plot(x, y3, color='blue')
-    plt.ylabel(ytext3)
-    plt.xlabel(xtext)
-    plt.grid(True)
+#     fig.add_subplot(rows, col, 3)
+#     plt.plot(x, y3, color='blue')
+#     plt.ylabel(ytext3)
+#     plt.xlabel(xtext)
+#     plt.grid(True)
 
-    plt.pause(0.1)
-
-
-v_arr, p_arr, d_arr, t_arr = [], [], [], []
+#     plt.pause(0.1)
 
 
-def figures():
-    v_arr.append(v1)
-    p_arr.append(p1)
-    d_arr.append(DUTY)
-    t_arr.append(getTime(date))
-    plot(t_arr, v_arr, p_arr, d_arr, "Time", "Voltage", "Power", "Duty Ratio")
+# v_arr, p_arr, d_arr, t_arr = [], [], [], []
+
+
+# def figures():
+#     v_arr.append(v1)
+#     p_arr.append(p1)
+#     d_arr.append(DUTY)
+#     t_arr.append(getTime(date))
+#     plot(t_arr, v_arr, p_arr, d_arr, "Time", "Voltage", "Power", "Duty Ratio")
 
 
 # -----------------------initial measurement------------------------
@@ -247,8 +247,8 @@ try:
         makecsv()
         disp()
 
-        if str(args.Graph) == "True" or str(args.Graph) == "true":
-            figures()  # Figure functions, uncomment if not needed
+        # if str(args.Graph) == "True" or str(args.Graph) == "true":
+        #     figures()  # Figure functions, uncomment if not needed
 
         wiringpi.delay(delay)
 
