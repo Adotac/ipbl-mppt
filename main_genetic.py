@@ -49,7 +49,8 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-d", "--Duty", help="Set initial Duty value")
 parser.add_argument("-i", "--D_Increment", help="Set duty incremental value")
-parser.add_argument("-r", "--Range", help="Set Range value")
+parser.add_argument("-f", "--Frequency", help="Set Frequency value (Default: 96)")
+parser.add_argument("-c", "--Clock", help="Set Clock value (Default: 20)")
 parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
 
 args = parser.parse_args()
@@ -188,6 +189,34 @@ class genetic:
             new_gen = sorted(new_gen, key=lambda x: fitness_score(x)[0], reverse=False)
 
             return new_gen[:self.POP_MAX]
+        
+        def check_FS(population, generation):
+            global CLOSEST_PID
+            global cumulative_distance
+
+            cumulative_distance = np.hstack((cumulative_distance,
+                                np.array(distance(fitness_score(population[0])[1])))) # only get the lowest distance in the population
+
+            # z value * stdev / sample
+            merr = 2.58 * (st.stdev(cumulative_distance) / self.POP_MAX)  # 99% confidence interval
+
+            for ind in population:
+                SD, r_points = fitness_score(ind)
+                LRS = len(r_points[0])
+
+                print(f'{ind} | G.{generation} | Distance from path:{SD} | N# of plots:{LRS}')
+                if (SD <= np.sum(cumulative_distance)*merr) and LRS >= MIN_LR:
+                    CLOSEST_PID = (list(ind), generation, SD, LRS)
+
+                    # hideOnly_selectedGraph(population, cgraph, index=generation)
+                    print(f'Closest Config Found!')
+                    return True
+
+                if SD == 0: # one in a lifetime miracle perfect result
+                    print(f'Config Found!')
+                    return True
+
+            return False
 
 
 # --------------Datetime processing---------------------

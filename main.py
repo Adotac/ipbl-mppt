@@ -40,8 +40,8 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-d", "--Duty", help="Set initial Duty value (Default: 0)")
 parser.add_argument("-i", "--D_Increment", help="Set duty incremental value (Default: 2)")
-parser.add_argument("-f", "--Frequency", help="Set Frequency value (Default: 96)")
-parser.add_argument("-c", "--Clock", help="Set Clock value (Default: 20)")
+# parser.add_argument("-f", "--Frequency", help="Set Frequency value (Default: 96)")
+# parser.add_argument("-c", "--Clock", help="Set Clock value (Default: 20)")
 parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
 
 args = parser.parse_args()
@@ -52,11 +52,11 @@ if args.Duty:
 if args.D_Increment:
     inc = int(args.D_Increment)
 
-if args.Frequency:
-    Range = int(args.Frequency)
+# if args.Frequency:
+#     Range = int(args.Frequency)
     
-if args.Clock:
-    Clock = int(args.Clock)
+# if args.Clock:
+#     Clock = int(args.Clock)
 # --------------------------------------------------------------------- #
 
 

@@ -19,18 +19,6 @@ icali_in = (1)  # in Current correction value
 
 # Frequency templates
 
-# 1kHz
-# Range=96
-# Clock=200
-
-# 2kHz
-# Range=120
-# Clock=80
-
-# 5kHz
-# Range=96
-# Clock=40
-
 # 10kHz
 Range = 96
 Clock = 20
@@ -42,7 +30,8 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-d", "--Duty", help="Set initial Duty value")
 parser.add_argument("-i", "--D_Increment", help="Set duty incremental value")
-parser.add_argument("-r", "--Range", help="Set Range value")
+parser.add_argument("-f", "--Frequency", help="Set Frequency value (Default: 96)")
+parser.add_argument("-c", "--Clock", help="Set Clock value (Default: 20)")
 parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
 
 args = parser.parse_args()
@@ -55,6 +44,12 @@ if args.D_Increment:
 
 if args.Range:
     Range = int(args.Range)
+    
+# if args.Frequency:
+#     Range = int(args.Frequency)
+    
+# if args.Clock:
+#     Clock = int(args.Clock)
 # --------------------------------------------------------------------- #
 
 # Voltage, current, for calibration
