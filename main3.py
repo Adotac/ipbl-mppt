@@ -13,15 +13,19 @@ ad_in = 0x41  # voltage_in, current_in
 PWM_PIN = 18  # GPIOの18
 DUTY = 0  # Duty initial
 delay = 1000
-inc = 2  # duty increment
+inc = 5  # duty increment
 vcali = 1  # in calibration
 icali_in = (1)  # in Current correction value
 
 # Frequency templates
 
 # 10kHz
-Range = 96
-Clock = 20
+# Range = 96
+# Clock = 20
+
+# 25kHz
+Range = 6
+Clock = 128
 
 # ------------------- console arguments ------------------------------- #
 
@@ -128,24 +132,46 @@ def makecsv():
     writer.writerow(l1)
 
 # v1,p1---->new,  v0,p0----->old
+
+osciSum = 0
+osciFlag = False
+treshold = 0.05
 # --------------------------MPPT------------------------
 def mppt(duty_now):
+    global osciSum, osciFlag, treshold
     case1 = (duty_now <= miLim)  # case when duty ratio reach lower limit
     case2 = (duty_now >= maLim)  # case when duty ratio reach upper limit
 
+    pRate = p1 - p0
+    vRate = v1 - v0
+    tresh_case = (treshold < pRate or treshold > pRate)
     mppt_case1 = (v0 > v1 and p0 > p1) or (v0 < v1 and p0 < p1)
     mppt_case2 = (v0 > v1 and p0 < p1) or (v0 < v1 and p0 > p1)
     # mppt_case3=(v0==v1 or p0==p1)
 
-    if case1 or mppt_case2:
+    if not osciFlag and tresh_case:
+        osciSum += 1
+        osciFlag = True
+    elif tresh_case and osciSum < 3:
+        osciSum += 1
+    else:
+        if pRate <= 0.05 and vRate <= 0.05:
+            osciFlag = False
+            osciSum = 0
+
+
+    if case1 or mppt_case2 and tresh_case:
         duty_next = duty_now + inc
         return duty_next
-    elif case2 or mppt_case1:
+    elif case2 or mppt_case1 and not tresh_case:
         duty_next = duty_now - inc
         return duty_next
     else:
         duty_next = duty_now
         return duty_next
+
+
+
 
 
 # --------------------------display data------------------------

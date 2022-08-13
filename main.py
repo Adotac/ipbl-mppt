@@ -30,8 +30,16 @@ icali_in = (1)  # in Current correction value
 # Clock=40
 
 # 10kHz
-Range = 96
-Clock = 20
+# Range = 96
+# Clock = 20
+
+# 25kHz
+Range = 6
+Clock = 128
+
+# 30kHz
+# Range = 5
+# Clock = 128
 
 # ------------------- console arguments ------------------------------- #
 
@@ -42,7 +50,6 @@ parser.add_argument("-d", "--Duty", help="Set initial Duty value (Default: 0)")
 parser.add_argument("-i", "--D_Increment", help="Set duty incremental value (Default: 2)")
 # parser.add_argument("-f", "--Frequency", help="Set Frequency value (Default: 96)")
 # parser.add_argument("-c", "--Clock", help="Set Clock value (Default: 20)")
-parser.add_argument("-g", "--Graph", help="Show real-time graph plot")
 
 args = parser.parse_args()
 
@@ -162,55 +169,6 @@ def disp():
         p1) + ' W' + '    DUTY: ' + str(DUTY) + ' alpha'
     print(d)
 
-
-# def getTime(timestring):
-#     t = timestring.replace("'", '')
-#     t = t.split('/')
-#     timeObj = datetime.datetime.strptime(t[3], '%H:%M:%S')
-#     return timeObj
-
-
-# # ---------------------- Just comment if not needed ---------------------
-# import matplotlib.pyplot as plt
-
-# def plot(x, y1, y2, y3, xtext, ytext1, ytext2, ytext3):
-#     fig = plt.figure('Graph MPPT', figsize=(10, 12), dpi=90, tight_layout=True)
-#     plt.cla()
-#     rows = 3
-#     col = 1
-
-#     fig.add_subplot(rows, col, 1)
-#     plt.plot(x, y1, color='red')
-#     plt.ylabel(ytext1)
-#     plt.xlabel(xtext)
-#     plt.grid(True)
-
-#     fig.add_subplot(rows, col, 2)
-#     plt.plot(x, y2, color='green')
-#     plt.ylabel(ytext2)
-#     plt.xlabel(xtext)
-#     plt.grid(True)
-
-#     fig.add_subplot(rows, col, 3)
-#     plt.plot(x, y3, color='blue')
-#     plt.ylabel(ytext3)
-#     plt.xlabel(xtext)
-#     plt.grid(True)
-
-#     plt.pause(0.1)
-
-
-# v_arr, p_arr, d_arr, t_arr = [], [], [], []
-
-
-# def figures():
-#     v_arr.append(v1)
-#     p_arr.append(p1)
-#     d_arr.append(DUTY)
-#     t_arr.append(getTime(date))
-#     plot(t_arr, v_arr, p_arr, d_arr, "Time", "Voltage", "Power", "Duty Ratio")
-
-
 # -----------------------initial measurement------------------------
 try:
     v0 = '%.3f' % GetVin()
@@ -250,9 +208,6 @@ try:
         date = Ddata()
         makecsv()
         disp()
-
-        # if str(args.Graph) == "True" or str(args.Graph) == "true":
-        #     figures()  # Figure functions, uncomment if not needed
 
         wiringpi.delay(delay)
 

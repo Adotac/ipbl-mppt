@@ -4,17 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-# --------------------- initial values ----------------------------- #
 
-# DUTY = 0  # Duty initial
-# delay = 1000
-# inc = 2  # duty increment
-# vcali = 1  # in calibration
-# icali_in = (1)  # in Current correction value
-
-# # 10kHz
-# Range = 96
-# Clock = 20
 
 # reading csv with pandas
 def readData(path):
@@ -54,54 +44,74 @@ def plot(X, Y, Xtext, Ytext):
     # ax.ticklabel_format(useOffset=False, style='plain')
     ctr = 1
     for i in range(x_len):
-        plt.subplots_adjust(left=0.125, bottom=0.001, right=0.9, top=0.9, wspace=0.2, hspace=0.2)
-        plt.ticklabel_format(useOffset=False, style='plain')
-        fig.add_subplot(rows, col, ctr)
+        # plt.subplots_adjust(left=0.125, bottom=0.001, right=0.9, top=0.9, wspace=0.2, hspace=0.2)
+        # plt.ticklabel_format(useOffset=False, style='plain')
+        fig.add_subplot(int(rows), int(col), ctr)
         plt.plot(X[i], Y[i])
         plt.ylabel(Ytext[i])
         plt.xlabel(Xtext[i])
-        # plt.grid(True)
+        plt.grid(True)
         ctr+=1
         
         
     
 #     plt.pause(0.1)
 
-# --------------Datetime processing---------------------
-def Ddata():
-    today1 = datetime.datetime.today()
-    year = str(today1.year)
-    month = str(today1.month)
-    day = str(today1.day)
-    hour = str(today1.hour)
-    minute = str(today1.minute)
-    second = str(today1.second)
-    if int(minute) < 10:
-        minute = '0' + minute
-    Ddata = "\'" + year + '/' + month + '/' + day + \
-        '/' + hour + ':' + minute + ':' + second + "\'"
-    return Ddata
+def duty_calc(t, v=None, i=None, p=None):
+    # --------------------- initial values ----------------------------- #
+    DUTY = 0  # Duty initial
+    delay = 1000
+    inc = 2  # duty increment
+    vcali = 1  # in calibration
+    icali_in = (1)  # in Current correction value
+
+    v0, i0, p0 = v[0], i[0], p[0]
+    v1, i1, p1 = 0, 0, 0
+
+    # 10kHz
+    Range = 5
+    Clock = 128
+
+    miLim = int(Range * 0.1)  # Duty minimum
+    maLim = int(Range * 1)  # Duty maximum
+
+    def mppt(duty_now):
+        case1 = (duty_now <= miLim)  # case when duty ratio reach lower limit
+        case2 = (duty_now >= maLim)  # case when duty ratio reach upper limit
+
+        mppt_case1 = (v0 > v1 and p0 > p1) or (v0 < v1 and p0 < p1)
+        mppt_case2 = (v0 > v1 and p0 < p1) or (v0 < v1 and p0 > p1)
+        # mppt_case3=(v0==v1 or p0==p1)
+
+        if case1 or mppt_case2:
+            duty_next = duty_now + inc
+            return duty_next
+        elif case2 or mppt_case1:
+            duty_next = duty_now - inc
+            return duty_next
+        else:
+            duty_next = duty_now
+            return duty_next
+
+    ctr = 0
+    for x in t:
+        v1 = v[x-1]
+        i1 = i[x-1]
+        p1 = p[x-1]
+        DUTY = mppt(DUTY)
+        tDuty = float(DUTY)* 100 / Range
+        trueDuty = '%.1f' % tDuty
+        print(x, trueDuty)
+
+        v0 = v1
+        i0 = i1
+        p0 = p1
+        ctr+=1
 
 
-# def mppt(duty_now):
-#     case1 = (duty_now <= miLim)  # case when duty ratio reach lower limit
-#     case2 = (duty_now >= maLim)  # case when duty ratio reach upper limit
-
-#     mppt_case1 = (v0 > v1 and p0 > p1) or (v0 < v1 and p0 < p1)
-#     mppt_case2 = (v0 > v1 and p0 < p1) or (v0 < v1 and p0 > p1)
-#     # mppt_case3=(v0==v1 or p0==p1)
-
-#     if case1 or mppt_case2:
-#         duty_next = duty_now + inc
-#         return duty_next
-#     elif case2 or mppt_case1:
-#         duty_next = duty_now - inc
-#         return duty_next
-#     else:
-#         duty_next = duty_now
-#         return duty_next
-    
 def main():
+    IDEAL_V = 18.2
+
     # path = '2022_8_12_IN.csv'
     path = '2nd INPUT.csv'
     
@@ -136,8 +146,10 @@ def main():
     out_YTarr = ["Voltage Output", "Current Output", "Power Output"]
     out_XTarr = ["Time", "Time","Time"]
     
-    plot(in_Xarr, in_Yarr, in_XTarr, in_YTarr)
-    plot(out_Xarr, out_Yarr, out_XTarr, out_YTarr)
+    # plot(in_Xarr, in_Yarr, in_XTarr, in_YTarr)
+    # plot(out_Xarr, out_Yarr, out_XTarr, out_YTarr)
+
+    duty_calc(t, v, i, p)
     
     # makecsv()
     plt.show()
