@@ -13,7 +13,6 @@ ad_in = 0x41  # voltage_in, current_in
 PWM_PIN = 18  # GPIOの18
 DUTY = 0  # Duty initial
 delay = 1000
-inc = 5  # duty increment
 vcali = 1  # in calibration
 icali_in = (1)  # in Current correction value
 
@@ -132,21 +131,23 @@ def makecsv():
     writer.writerow(l1)
 
 # v1,p1---->new,  v0,p0----->old
-
-osciSum = 0
-osciFlag = False
-treshold = 0.05
+osciSum = 0 # total number of oscillations (max: 3)
+osciFlag = False # if oscillation is detected
+treshold = 0.05 # desired threshold for variable step strategy
+inc = 0  # initial duty increment
 # --------------------------MPPT------------------------
 def mppt(duty_now):
-    global osciSum, osciFlag, treshold
+    global osciSum, osciFlag, treshold, inc
+    pRate = p1 - p0
+    vRate = v1 - v0
     case1 = (duty_now <= miLim)  # case when duty ratio reach lower limit
     case2 = (duty_now >= maLim)  # case when duty ratio reach upper limit
 
-    pRate = p1 - p0
-    vRate = v1 - v0
-    tresh_case = (treshold < pRate or treshold > pRate)
-    mppt_case1 = (v0 > v1 and p0 > p1) or (v0 < v1 and p0 < p1)
-    mppt_case2 = (v0 > v1 and p0 < p1) or (v0 < v1 and p0 > p1)
+    # case to detect oscillation and difference from threshold
+    tresh_case = (treshold < pRate and treshold < vRate) or (treshold > pRate and treshold > vRate)
+
+    mppt_case1 = (v0 > v1 and p0 > p1) or (v0 < v1 and p0 < p1) # case for decrementing duty
+    mppt_case2 = (v0 > v1 and p0 < p1) or (v0 < v1 and p0 > p1) # case for incrementing duty
     # mppt_case3=(v0==v1 or p0==p1)
 
     if not osciFlag and tresh_case:
@@ -159,12 +160,13 @@ def mppt(duty_now):
             osciFlag = False
             osciSum = 0
 
-
     if case1 or mppt_case2 and tresh_case:
-        duty_next = duty_now + inc
+        duty_next = duty_now + 5
+        inc = 5
         return duty_next
     elif case2 or mppt_case1 and not tresh_case:
-        duty_next = duty_now - inc
+        duty_next = duty_now - 1
+        inc = 1
         return duty_next
     else:
         duty_next = duty_now
